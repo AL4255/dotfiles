@@ -13,29 +13,45 @@ if [[ "$(uname -s)" == "Darwin" ]] || [[ -n "$DISPLAY" ]] || [[ -n "$WAYLAND_DIS
     HAS_GUI=true
 fi
 
-install_packages() {
-    if command -v brew &> /dev/null; then
-        brew install neovim tmux starship
-        $HAS_GUI && brew install --cask kitty
-    elif command -v apt-get &> /dev/null; then
-        sudo apt-get update && sudo apt-get install -y neovim tmux
+install_starship() {
+    command -v starship &> /dev/null && return
+    if command -v curl &> /dev/null; then
         curl -sS https://starship.rs/install.sh | sh -s -- -y
-        $HAS_GUI && sudo apt-get install -y kitty
-    elif command -v yum &> /dev/null; then
-        sudo yum install -y neovim tmux
-        curl -sS https://starship.rs/install.sh | sh -s -- -y
-        $HAS_GUI && sudo yum install -y kitty
-    elif command -v pacman &> /dev/null; then
-        sudo pacman -Sy --noconfirm neovim tmux starship
-        $HAS_GUI && sudo pacman -Sy --noconfirm kitty
+    elif command -v wget &> /dev/null; then
+        wget -qO- https://starship.rs/install.sh | sh -s -- -y
     else
-        echo "Could not detect a package manager. Install neovim, tmux, and starship manually." >&2
+        echo "Neither curl nor wget found; install starship manually: https://starship.rs" >&2
     fi
 }
 
-if ! command -v nvim &> /dev/null || ! command -v tmux &> /dev/null || ! command -v starship &> /dev/null; then
-    echo "Installing neovim/tmux/starship..."
+install_packages() {
+    if command -v brew &> /dev/null; then
+        brew install neovim tmux starship curl
+        $HAS_GUI && brew install --cask kitty
+    elif command -v apt-get &> /dev/null; then
+        sudo apt-get update && sudo apt-get install -y neovim tmux zsh curl
+        install_starship
+        $HAS_GUI && sudo apt-get install -y kitty
+    elif command -v yum &> /dev/null; then
+        sudo yum install -y neovim tmux zsh curl
+        install_starship
+        $HAS_GUI && sudo yum install -y kitty
+    elif command -v pacman &> /dev/null; then
+        sudo pacman -Sy --noconfirm neovim tmux starship zsh curl
+        $HAS_GUI && sudo pacman -Sy --noconfirm kitty
+    else
+        echo "Could not detect a package manager. Install neovim, tmux, zsh, and starship manually." >&2
+    fi
+}
+
+if ! command -v nvim &> /dev/null || ! command -v tmux &> /dev/null || ! command -v starship &> /dev/null || ! command -v zsh &> /dev/null; then
+    echo "Installing neovim/tmux/zsh/starship..."
     install_packages
+fi
+
+if command -v zsh &> /dev/null && [[ "$SHELL" != *zsh ]]; then
+    echo "Setting zsh as your default shell..."
+    chsh -s "$(command -v zsh)" || echo "Could not chsh automatically; run manually: chsh -s $(command -v zsh)"
 fi
 
 backup_and_link() {
@@ -56,5 +72,5 @@ if $HAS_GUI && command -v kitty &> /dev/null; then
     backup_and_link ~/.config/kitty/kitty.conf "$DOTFILES/kitty/kitty.conf"
 fi
 
-echo "Linked. Restart your shell (or run: exec zsh), start tmux, open nvim and run :Lazy to sync plugins."
+echo "Linked. Run 'exec zsh' (or log out and back in) to switch this session to zsh, start tmux, open nvim and run :Lazy to sync plugins."
 echo "Add machine-specific secrets/overrides to ~/.zshrc.local (not tracked in git)."
