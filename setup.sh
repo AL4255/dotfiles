@@ -29,7 +29,8 @@ install_packages() {
         brew install neovim tmux starship curl
         $HAS_GUI && brew install --cask kitty
     elif command -v apt-get &> /dev/null; then
-        sudo apt-get update && sudo apt-get install -y neovim tmux zsh curl
+        sudo apt-get update || true
+        sudo apt-get install -y neovim tmux zsh curl
         install_starship
         $HAS_GUI && sudo apt-get install -y kitty
     elif command -v yum &> /dev/null; then
