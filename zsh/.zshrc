@@ -1,3 +1,4 @@
+# Homebrew PATH configuration
 if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 elif [[ -f "/usr/local/bin/brew" ]]; then
@@ -5,7 +6,8 @@ elif [[ -f "/usr/local/bin/brew" ]]; then
 fi
 
 # Add dotfiles bin to PATH
-export PATH="$HOME/.dotfiles/bin:$PATH"
+export PATH="$HOME/dotfiles/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 # History configuration
 HISTFILE=~/.zsh_history
@@ -44,7 +46,6 @@ alias gco='git checkout'
 alias gb='git branch'
 alias glog='git log --oneline --graph --decorate'
 
-
 alias ls='ls -G'
 alias ll='ls -lah'
 alias la='ls -A'
@@ -65,7 +66,7 @@ alias tn='tmux new -s'
 alias tl='tmux ls'
 
 # Quick directory aliases
-alias dotfiles='cd ~/.dotfiles'
+alias dotfiles='cd ~/dotfiles'
 alias projects='cd ~/projects'
 
 # Editor
@@ -109,5 +110,6 @@ function extract() {
     echo "'$1' is not a valid file"
   fi
 }
-:
 
+# Load machine-specific secrets/overrides (not tracked in git)
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local

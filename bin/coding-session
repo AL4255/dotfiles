@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Creates a 3-panel tmux session for coding
+# Top: nvim | Bottom-left: claude | Bottom-right: terminal
+
+SESSION_NAME="coding"
+
+# Check if session already exists
+tmux has-session -t $SESSION_NAME 2>/dev/null
+
+if [ $? != 0 ]; then
+  # Create new session
+  tmux new-session -d -s $SESSION_NAME
+
+  # Split top pane vertically (left/right)
+  tmux split-window -h -t $SESSION_NAME:0.0
+
+  # Split horizontally to create bottom pane (full width)
+  tmux split-window -v -p 30 -t $SESSION_NAME:0.0
+
+  # Select top-left pane and start nvim
+  tmux select-pane -t $SESSION_NAME:0.0
+  tmux send-keys -t $SESSION_NAME:0.0 'nvim' C-m
+
+  # Select top-right pane for terminal
+  tmux select-pane -t $SESSION_NAME:0.1
+
+  # Select bottom pane and start claude
+  tmux select-pane -t $SESSION_NAME:0.2
+  tmux send-keys -t $SESSION_NAME:0.2 'claude' C-m
+fi
+
+# Attach to session
+tmux attach-session -t $SESSION_NAME
