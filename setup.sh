@@ -73,5 +73,12 @@ if $HAS_GUI && command -v kitty &> /dev/null; then
     backup_and_link ~/.config/kitty/kitty.conf "$DOTFILES/kitty/kitty.conf"
 fi
 
-echo "Linked. Run 'exec zsh' (or log out and back in) to switch this session to zsh, start tmux, open nvim and run :Lazy to sync plugins."
+echo "Linked. Start tmux, open nvim and run :Lazy to sync plugins."
 echo "Add machine-specific secrets/overrides to ~/.zshrc.local (not tracked in git)."
+
+# Drop straight into zsh so aliases (v, g, t, ...) work immediately in this
+# session, instead of requiring the user to remember to run 'exec zsh' or
+# log out and back in.
+if [[ -t 1 ]] && command -v zsh &> /dev/null; then
+    exec zsh -l
+fi
