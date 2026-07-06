@@ -1,4 +1,4 @@
-# Homebrew PATH configuration
+# Homebrew PATH configuration  
 if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 elif [[ -f "/usr/local/bin/brew" ]]; then
